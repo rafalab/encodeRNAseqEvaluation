@@ -5,16 +5,16 @@ You can download them from here: https://github.com/ririzarr/encodeRNAseqEvaluat
 
 First decide if you are quantifying genes or transcripts (generically called features here). Once you decide download one of these annotation tables:
 
-gencode.v16.annotation.genes.txt.gz - if quantifying genes use this file
-gencode.v16.annotation.transcripts.txt.gz - if quantifying transcripts use this file
+gencode.v16.annotation.genes.gtf.gz - if quantifying genes use this file
+gencode.v16.annotation.transcripts.gtf.gz - if quantifying transcripts use this file
 
 Note: for each submission you have to pick one. But you can submit more than once. For example, you can submit a gene quantification and a transcript quantification. But you have to submit separately.
 
 CREATE THE TAB DELIMITED QUANTIFICATION TABLE
 
-First column has the feature IDs which are the first column of the annotation tables
+First column has the feature_id which is in the first entry in the GTFs attribute column (9th column). The row order should be preserved with order in the annotation table
 
-First row annotates the samples: starts with “ID” then has the sample names.
+First row annotates the samples: starts with “feature_id” then has the sample names.
 
 The rest of the entries are the quantifications 
 
