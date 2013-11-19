@@ -11,3 +11,8 @@ These tables are subsets of the original except for these addition to the attrib
 1- the first addition is a unique ID (feature_id)
 2- the second addition is the row number of the original file corresponding to the entry (original_row)
 
+Note that there is also an exon table:
+
+gencode.v16.annotation.exon.gtf.gz
+
+in case we want to permit future exon submissions 
