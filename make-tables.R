@@ -1,3 +1,4 @@
+VERSION<-1
 SKIP<-5 ##number of lines to skip to get the information
 ##get the number of rows to read in
 filename<- "gencode.v16.annotation.gtf"
@@ -21,10 +22,20 @@ tmptab <- tab[geneIndex,]
 id <- strsplit(tmptab[,9],";")
 id <- sapply(id,function(x) gsub("\"","",gsub("gene_id ","",x[1])))
 if(any(duplicated(id))) stop("non-unique gene names")
-rownames(tmptab) <- id
-tmptab[[ncol(tmptab)+1]] <- geneIndex
-fn<-paste0(prefix,".genes.txt")
-write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t")
+##add ninth column
+tmp1<-paste0("feature_id \"",id,"\"")
+tmp2<-paste("original_row",geneIndex)
+tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
+tmptab[,9]<-tmp3
+
+fn<-paste0(prefix,".genes.gtf")
+cat(paste("##description: subset of",filename,"including only genes, version",VERSION,"\n"),file=fn)
+cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
+cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
+cat("##format: gtf\n",file=fn,append=TRUE)
+cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
+
+write.table(tmptab,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip",fn))
        
 ###Make trascript table and get a unique ID
@@ -33,10 +44,19 @@ tmptab <- tab[txIndex,]
 id <- strsplit(tmptab[,9],";")
 id <- sapply(id,function(x) gsub("\"","",gsub(" transcript_id ","",x[2])))
 if(any(duplicated(id))) stop("non-unique transcript names")
-rownames(tmptab) <- id
-tmptab[[ncol(tmptab)+1]] <- txIndex
-fn<-paste0(prefix,".transcripts.txt")
-write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t")
+##add column
+tmp1<-paste0("feature_id \"",id,"\"")
+tmp2<-paste("original_row",geneIndex)
+tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
+tmptab[,9]<-tmp3
+
+fn<-paste0(prefix,".transcripts.gtf")
+cat(paste("##description: subset of",filename,"including only transcripts, version",VERSION,"\n"),file=fn)
+cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
+cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
+cat("##format: gtf\n",file=fn,append=TRUE)
+cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
+write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip",fn))
 
 
