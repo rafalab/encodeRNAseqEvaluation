@@ -2,12 +2,12 @@ gencode.v16.annotation.gtf is the original ENCODE gtf file and can be obtained h
 ftp://ftp.sanger.ac.uk/pub/gencode/release_16/gencode.v16.annotation.gtf.gz
 
 I used make-tables.R
-to extract the transcripts and genes and make two new tables.
+to extract the transcripts and genes and make two new gtf files.
 
-gencode.v16.annotation.genes.txt.gz
-gencode.v16.annotation.transcripts.txt.gz
+gencode.v16.annotation.genes.gtf.gz
+gencode.v16.annotation.transcripts.gtf.gz
 
-These tables are subsets of the original except for these two columns:
-1- the first column is a unique ID
-2- the last column tells what row of the original gtf files corresponds to the row in this file.
+These tables are subsets of the original except for these addition to the attribute column:
+1- the first addition is a unique ID (feature_id)
+2- the second addition is the row number of the original file corresponding to the entry (original_row)
 
