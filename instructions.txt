@@ -3,7 +3,7 @@ Instructions on how to submit quantification results:
 GET ANNOTATION TABLES 
 You can download them from here: https://github.com/ririzarr/encodeRNAseqEvaluation
 
-First decide if you are quantifying genes or transcripts (generically called features here). Once you decide download one of these annotation tables:
+First decide if you are quantifying genes or transcripts (generically called features here). Once you decide, download one of these annotation tables:
 
 gencode.v16.annotation.genes.gtf.gz - if quantifying genes use this file
 gencode.v16.annotation.transcripts.gtf.gz - if quantifying transcripts use this file
@@ -16,7 +16,7 @@ First column has the feature_id which is in the first entry in the GTFs attribut
 
 First row annotates the samples: starts with “feature_id” then has the sample names.
 
-The rest of the entries are the quantifications 
+The rest of the entries in this table should be the quantifications 
 
 
 CREATE A SAMPLE ANNOTATION TABLE
