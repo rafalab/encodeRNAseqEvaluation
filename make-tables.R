@@ -13,8 +13,7 @@ tab <-  read.delim(filename,skip=SKIP,header=FALSE,stringsAsFactors=FALSE,colCla
 Indexes <- split(1:nrow(tab),tab[,3])
 geneIndex <- Indexes[["gene"]]
 txIndex <- Indexes[["transcript"]]
-##not using exon yet
-##exonIndex <- Indexes[["exon"]]
+exonIndex <- Indexes[["exon"]]
 
 ###Make gene table and get a unique ID
 tmptab <- tab[geneIndex,]
@@ -36,7 +35,7 @@ cat("##format: gtf\n",file=fn,append=TRUE)
 cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
 
 write.table(tmptab,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
-system(paste("gzip",fn))
+system(paste("gzip -f",fn))
        
 ###Make trascript table and get a unique ID
 tmptab <- tab[txIndex,]
@@ -57,15 +56,33 @@ cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
 cat("##format: gtf\n",file=fn,append=TRUE)
 cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
 write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
-system(paste("gzip",fn))
+system(paste("gzip -f",fn))
 
 
 ###Make exon table and get a unique ID
 ###We do not have a way to create unique exons yet
 ###so no exon table yet
-## tmptab <- tab[exonIndex,]
-## id <- strsplit(tmptab[,9],";")
+tmptab <- tab[exonIndex,]
+id <- strsplit(tmptab[,9],";")
+##using Julien Lagarde suggestions
+id1 <- sapply(id,function(x) gsub("\"","",gsub(" transcript_id ","",x[2])))
+id2 <- sapply(id,function(x) gsub("\"","",gsub(" exon_number ","",x[9])))
+id <- paste(id1,id2,sep="_")
+if(any(duplicated(id))) stop("non-unique transcript names")
+###add column
+tmp1<-paste0("feature_id \"",id,"\"")
+tmp2<-paste("original_row",exonIndex)
+tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
+tmptab[,9]<-tmp3
 
+fn<-paste0(prefix,".exon.gtf")
+cat(paste("##description: subset of",filename,"including only exons, version",VERSION,"\n"),file=fn)
+cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
+cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
+cat("##format: gtf\n",file=fn,append=TRUE)
+cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
+write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
+system(paste("gzip -f",fn))
 
 
 
