@@ -7,7 +7,7 @@ to extract the transcripts and genes and make two new tables.
 gencode.v16.annotation.genes.txt.gz
 gencode.v16.annotation.transcripts.txt.gz
 
-These tables are subsets of the original expect 
+These tables are subsets of the original except for these two columns:
 1- the first column is a unique ID
 2- the last column tells what row of the original gtf files corresponds to the row in this file.
 
