@@ -10,13 +10,16 @@ gencode.v16.annotation.transcripts.gtf.gz
 These tables are subsets of the original except for these addition to the attribute column:
 1- the first addition is a unique ID (feature_id)
 2- the second addition is the row number of the original file corresponding to the entry (original_row)
+3- rows were appended to the end to annotate the ENCODE spikeins
 
 You can use the file sanitycheck.R to check if the tables columns and rows match
 
 An example submission is here: exampleSubmission.tgz
 
-Note that there is also an exon table:
+Note 1: that there is also an exon table:
 
 gencode.v16.annotation.exon.gtf.gz
 
 in case we want to permit future exon submissions 
+
+Note 2: the files spikein_exon.gtf, spikein_gene.gtf, spikein_transcript.gtf contain just the spike-ins. These have been appended to the end of the annotation files
