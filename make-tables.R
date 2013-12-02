@@ -1,4 +1,4 @@
-VERSION<-1
+VERSION<-2
 SKIP<-5 ##number of lines to skip to get the information
 ##get the number of rows to read in
 filename<- "gencode.v16.annotation.gtf"
@@ -28,13 +28,17 @@ tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
 tmptab[,9]<-tmp3
 
 fn<-paste0(prefix,".genes.gtf")
-cat(paste("##description: subset of",filename,"including only genes, version",VERSION,"\n"),file=fn)
+cat(paste("##description: subset of",filename,"including only genes and adds ENCODE ERCC spikeins, version",VERSION,"\n"),file=fn)
 cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
 cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
 cat("##format: gtf\n",file=fn,append=TRUE)
 cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
 
 write.table(tmptab,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
+##Add spikein
+spikein<-read.delim("spikein_gene.gtf",header=FALSE,stringsAsFactors=FALSE,colClasses=c("character","character","character","integer","integer","character","character","character"),comment.char="",quote="")
+spikein[[2]] <- "spike_in"
+write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
        
 ###Make trascript table and get a unique ID
@@ -50,14 +54,17 @@ tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
 tmptab[,9]<-tmp3
 
 fn<-paste0(prefix,".transcripts.gtf")
-cat(paste("##description: subset of",filename,"including only transcripts, version",VERSION,"\n"),file=fn)
+cat(paste("##description: subset of",filename,"including only transcripts and adds ENCODE ERCC spikeins, version",VERSION,"\n"),file=fn)
 cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
 cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
 cat("##format: gtf\n",file=fn,append=TRUE)
 cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
-write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
+write.table(tmptab,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
+##Add spikein
+spikein<-read.delim("spikein_transcript.gtf",header=FALSE,stringsAsFactors=FALSE,colClasses=c("character","character","character","integer","integer","character","character","character"),comment.char="",quote="")
+spikein[[2]] <- "spike_in"
+write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
-
 
 ###Make exon table and get a unique ID
 ###We do not have a way to create unique exons yet
@@ -76,12 +83,16 @@ tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
 tmptab[,9]<-tmp3
 
 fn<-paste0(prefix,".exon.gtf")
-cat(paste("##description: subset of",filename,"including only exons, version",VERSION,"\n"),file=fn)
+cat(paste("##description: subset of",filename,"including only exons and adds ENCODE ERCC spikeins, version",VERSION,"\n"),file=fn)
 cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
 cat("##contact: rafa@jimmy.harvard.edu\n",file=fn,append=TRUE)
 cat("##format: gtf\n",file=fn,append=TRUE)
 cat(paste("##date:",date(),"\n"),file=fn,append=TRUE)
-write.table(tmptab,fn,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
+write.table(tmptab,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE) 
+##Add spikein
+spikein<-read.delim("spikein_exon.gtf",header=FALSE,stringsAsFactors=FALSE,colClasses=c("character","character","character","integer","integer","character","character","character"),comment.char="",quote="")
+spikein[[2]] <- "spike_in"
+write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
 
 
