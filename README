@@ -12,6 +12,8 @@ These tables are subsets of the original except for these addition to the attrib
 2- the second addition is the row number of the original file corresponding to the entry (original_row)
 3- rows were appended to the end to annotate the ENCODE spikeins
 
+Note that the files exon.id.txt, genes.id.txt and transcript.id.txt contain just the feature_ids
+
 You can use the file sanitycheck.R to check if the tables columns and rows match
 
 An example submission is here: exampleSubmission.tgz
