@@ -7,7 +7,7 @@ nrow=system(paste("wc -l",filename),intern=TRUE)
 nrow=as.numeric(strsplit(nrow," ")[[1]][2])-SKIP
 
 ##read in table
-tab <-  read.delim(filename,skip=SKIP,header=FALSE,stringsAsFactors=FALSE,colClasses=c("character","character","character","integer","integer","character","character","character"),comment.char="",nrow=nrow,quote="")
+if(!exists("tab")) tab <-  read.delim(filename,skip=SKIP,header=FALSE,stringsAsFactors=FALSE,colClasses=c("character","character","character","integer","integer","character","character","character"),comment.char="",nrow=nrow,quote="")
 
 ##split by gene, transcript, exon
 Indexes <- split(1:nrow(tab),tab[,3])
@@ -27,6 +27,7 @@ tmp2<-paste("original_row",geneIndex)
 tmp3<-paste(tmp1,tmp2,tmptab[,9],sep="; ")
 tmptab[,9]<-tmp3
 
+
 fn<-paste0(prefix,".genes.gtf")
 cat(paste("##description: subset of",filename,"including only genes and adds ENCODE ERCC spikeins, version",VERSION,"\n"),file=fn)
 cat("##provider: ENCODE DAC\n",file=fn,append=TRUE)
@@ -40,7 +41,10 @@ spikein<-read.delim("spikein_gene.gtf",header=FALSE,stringsAsFactors=FALSE,colCl
 spikein[[2]] <- "spike_in"
 write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
-       
+id=c(id,spikein[,1])
+write.table(id,file="genes.id.txt",row.names=FALSE,col.names=FALSE,quote=FALSE)
+
+
 ###Make trascript table and get a unique ID
 tmptab <- tab[txIndex,]
 ##get unique ID
@@ -65,6 +69,8 @@ spikein<-read.delim("spikein_transcript.gtf",header=FALSE,stringsAsFactors=FALSE
 spikein[[2]] <- "spike_in"
 write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
+id=c(id,spikein[,1])
+write.table(id,file="transcript.id.txt",row.names=FALSE,col.names=FALSE,quote=FALSE)
 
 ###Make exon table and get a unique ID
 ###We do not have a way to create unique exons yet
@@ -76,6 +82,7 @@ id1 <- sapply(id,function(x) gsub("\"","",gsub(" transcript_id ","",x[2])))
 id2 <- sapply(id,function(x) gsub("\"","",gsub(" exon_number ","",x[9])))
 id <- paste(id1,id2,sep="_")
 if(any(duplicated(id))) stop("non-unique transcript names")
+write.table(id,file="exon.id.txt",row.names=FALSE,col.names=FALSE)
 ###add column
 tmp1<-paste0("feature_id \"",id,"\"")
 tmp2<-paste("original_row",exonIndex)
@@ -94,6 +101,8 @@ spikein<-read.delim("spikein_exon.gtf",header=FALSE,stringsAsFactors=FALSE,colCl
 spikein[[2]] <- "spike_in"
 write.table(spikein,fn,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="\t",append=TRUE)
 system(paste("gzip -f",fn))
+id=c(id,spikein[,1])
+write.table(id,file="exon.id.txt",row.names=FALSE,col.names=FALSE,quote=FALSE)
 
 
 
