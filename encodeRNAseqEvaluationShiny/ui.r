@@ -2,12 +2,12 @@ library(shiny)
 widget_style <- "display: inline-block; vertical-align: text-top; padding: 0px; border: solid;
                   border-width: 0px; border-radius: 0px; border-color: #CCC;"
 shinyUI(pageWithSidebar(
-  headerPanel("ENCODE RNAseq Evaluation"),
-  sidebarPanel(
-    style="min-width:235px;max-width:320px", 
-    submitButton("Update"),
-    br(),
-    HTML("<style>
+    headerPanel("ENCODE RNAseq Evaluation"),
+    sidebarPanel(
+        style="min-width:235px;max-width:320px", 
+        submitButton("Update"),
+        br(),
+        HTML("<style>
           div.pos1{
                width:80px;
                }
@@ -116,14 +116,13 @@ shinyUI(pageWithSidebar(
                  <input type='number' name='yend3' style='width:105px' value='1' min='0' max='1'/>
               </div>
           </div>
-          <label>Constant to be added for the second plot</label>
+          <label>Constant to be added for both second plot</label>
           <label>(unit: FPKM; should be <= cutoff)</label> 
           <div class='container'>
               <div class='pos1'>
                  <input type='number' name='constant1' style='width:105px' value='1' min='0.00001' max='1000'/>
               </div>
           </div>
-
 
           <br>
           <h5>CAT plot between RNA-seq and microarray:</h5>
@@ -147,36 +146,61 @@ shinyUI(pageWithSidebar(
                  <input type='number' name='yend4' style='width:105px' value='1' min='0' max='1'/>
               </div>
           </div>
-          <label>Constant to be added for the second plot</label>
+          <label>Constant to be added for both second plot</label>
           <label>(unit: FPKM; should be <= cutoff)</label> 
           <div class='container'>
               <div class='pos1'>
                  <input type='number' name='constant2' style='width:105px' value='1' min='0.00001' max='1000'/>
               </div>
-          </div>
-"
-         )
-    ),
+          </div>"
+             )
+        ),
 
-      mainPanel(
+    mainPanel(
         h3(textOutput("caption")),
         tabsetPanel(
-            tabPanel("SD versus detrended log signal",plotOutput("sdplot",width="600px", height="600px")),
-            tabPanel("Proportion of zeros",wellPanel(
-              div(style = widget_style,plotOutput("p0plot",width="600px", height="600px")),
-              div(style = widget_style,tableOutput("p0stbl"))
-              )),
-            tabPanel("CAT plot for replicates",wellPanel(
-              #h5("First is plot based on all non-zero genes,with fold changes of genes at least have one zero in all replicates being set as 0."),
-              #h5("Second is plot based on all genes, with constant added for zeros."),
-                div(style = widget_style,plotOutput("catplot1",width="600px", height="600px")),
-                div(style = widget_style,plotOutput("catplot2",width="600px", height="600px"))
-                )),
-            tabPanel("CAT plot comparing to microarrays", wellPanel(
-              #h5("Only genes both in RNA-seq and microarray are displayed."),
-              #h5("First is plot based on all non-zero genes,with fold changes of genes at least have one zero in all replicates being set as 0."),
-              #h5("Second is plot based on all genes, with constant added for zeros."),
+            tabPanel("SD versus detrended log signal",
+                     wellPanel(
+                         h4("Without normalization",align = "center"),
+                         plotOutput("sdplot",width="600px", height="600px")),
+                     br(),
+                     wellPanel(
+                         h4("With normalization",align = "center"),
+                         plotOutput("sdplot_qn",width="600px", height="600px"))
+                     ),
+            tabPanel("Proportion of zeros",
+                     wellPanel(
+                         h4("Without normalization",align = "center"),
+                         div(style = widget_style,plotOutput("p0plot",width="600px", height="600px")),
+                         div(style = widget_style,tableOutput("p0stbl"))),
+                     br(),
+                     wellPanel(
+                         h4("With normalization",align = "center"),
+                         div(style = widget_style,plotOutput("p0plot_qn",width="600px", height="600px")),
+                         div(style = widget_style,tableOutput("p0stbl_qn")))
+                     ),
+            tabPanel("CAT plot for replicates",
+                     wellPanel(
+                         h4("Without normalization",align = "center"),
+                         div(style = widget_style,plotOutput("catplot1",width="600px", height="600px")),
+                         div(style = widget_style,plotOutput("catplot2",width="600px", height="600px"))),
+                     br(),
+                     wellPanel(
+                         h4("With normalization",align = "center"),
+                         div(style = widget_style,plotOutput("catplot1_qn",width="600px", height="600px")),
+                         div(style = widget_style,plotOutput("catplot2_qn",width="600px", height="600px")))
+                     ),
+            tabPanel("CAT plot comparing to microarrays",
+                     wellPanel(
+                         h4("Without normalization",align = "center"),
                          div(style = widget_style,plotOutput("catplotarray1",width="600px", height="600px")),
-                         div(style = widget_style,plotOutput("catplotarray2",width="600px", height="600px"))
-                         ))
-            ))))
+                         div(style = widget_style,plotOutput("catplotarray2",width="600px", height="600px"))),
+                     br(),
+                     wellPanel(
+                         h4("With normalization",align = "center"),
+                         div(style = widget_style,plotOutput("catplotarray1_qn",width="600px", height="600px")),
+                         div(style = widget_style,plotOutput("catplotarray2_qn",width="600px", height="600px")))
+                     )
+                )
+        )
+    ))

@@ -249,12 +249,30 @@ colors <- c("brown","red","royalblue","seagreen","olivedrab1","purple",
             "maroon1","black","orange","yellow")
 labels <- c("RSEM tpm","RSEM tpmpme","Flux Capacitor","Cufflinks with STAR","Cufflinks with Tophat","Sailfish","eXpress","Naive")
 shinyServer(function(input, output) {
+    packs_qn <- reactive({
+        cat(input$protocol,'\t',input$genetype,"\n")
+        load(paste0(input$protocol,"_g_qn.rda"))
+        medians <- hkctr(quant)
+        FPKMmedian <- sum(medians[4:5])/2
+        cutD <- log2(input$cutFPKM)-FPKMmedian
+        thresholds <- 2^(cutD+medians)
+        quant <- typefilter(quant,input$genetype)
+        quant <- cutfilter(quant,thresholds)
+        cat(thresholds,"\tqn\n")
+        all0kick <- sapply(quant,max)>0
+        quant <- quant[all0kick]
+        labels <- labels[all0kick]
+        colors <- colors[which(all0kick)]
+        medians <- medians[all0kick]
+        thresholds <- thresholds[all0kick]
+        list(quant=quant,medians=medians,labels=labels,colors=colors,FPKMmedian=FPKMmedian)
+    })
     packs <- reactive({
-      cat(input$protocol,'\t',input$genetype,"\n")
+        cat(input$protocol,'\t',input$genetype,"\n")
         load(paste0(input$protocol,"_g.rda"))
         medians <- hkctr(quant)
-      FPKMmedian <- sum(medians[4:5])/2
-      cutD <- log2(input$cutFPKM)-FPKMmedian
+        FPKMmedian <- sum(medians[4:5])/2
+        cutD <- log2(input$cutFPKM)-FPKMmedian
         thresholds <- 2^(cutD+medians)
         quant <- typefilter(quant,input$genetype)
         quant <- cutfilter(quant,thresholds)
@@ -262,10 +280,10 @@ shinyServer(function(input, output) {
         all0kick <- sapply(quant,max)>0
         quant <- quant[all0kick]
         labels <- labels[all0kick]
-        colors2 <- colors[which(all0kick)]
+        colors <- colors[which(all0kick)]
         medians <- medians[all0kick]
         thresholds <- thresholds[all0kick]
-        list(quant=quant,medians=medians,labels=labels,colors=colors2,FPKMmedian=FPKMmedian)
+        list(quant=quant,medians=medians,labels=labels,colors=colors,FPKMmedian=FPKMmedian)
     })
     output$caption <- renderText({
         input$protocol
@@ -276,6 +294,12 @@ shinyServer(function(input, output) {
                       xlim=c(input$xstart1,input$xend1),ylim=c(input$ystart1,input$yend1),
                       xlab="Detrended log signal",ylab="SD",main=NULL)
     })
+    output$sdplot_qn <- renderPlot({
+        pack <- packs_qn()
+        sdaplot_scale(pack$quant,pack$medians,pack$colors,pack$labels,
+                      xlim=c(input$xstart1,input$xend1),ylim=c(input$ystart1,input$yend1),
+                      xlab="Detrended log signal",ylab="SD",main=NULL)
+    })    
     output$p0plot <- renderPlot({
         pack <- packs()
         p0plot_scale1(pack$quant,pack$medians,step=0.1,pack$colors,pack$labels,
@@ -286,28 +310,66 @@ shinyServer(function(input, output) {
         pack <- packs()
         p0plot_scale2(pack$quant,pack$labels)
     })
+    output$p0plot_qn <- renderPlot({
+        pack <- packs_qn()
+        p0plot_scale1(pack$quant,pack$medians,step=0.1,pack$colors,pack$labels,
+                     xlim=c(input$xstart2,input$xend2),ylim=c(input$ystart2,input$yend2),
+                     xlab="Detrended log signal",ylab="Proportion",main=NULL)
+    })
+    output$p0stbl_qn <- renderTable({
+        pack <- packs_qn()
+        p0plot_scale2(pack$quant,pack$labels)
+    })
     output$catplot1 <- renderPlot({
         pack <- packs()
         catplot(pack$quant,pack$medians,pack$FPKMmedian,input$constant1,pack$colors,pack$labels,
                 xlim=c(input$xstart3,input$xend3),ylim=c(input$ystart3,input$yend3),
-                xlab="Size of list",ylab="Proportion in common",main=NULL)
+                xlab="Size of list",ylab="Proportion in common",main="without constant")
     })
     output$catplot2 <- renderPlot({
         pack <- packs()
         catplot(pack$quant,pack$medians,pack$FPKMmedian,input$constant1,pack$colors,pack$labels,
                 xlim=c(input$xstart3,input$xend3),ylim=c(input$ystart3,input$yend3),
-                xlab="Size of list",ylab="Proportion in common",main=NULL,stringent=F)
+                xlab="Size of list",ylab="Proportion in common",main="constant added",stringent=F)
+    })
+    output$catplot1_qn <- renderPlot({
+        pack <- packs_qn()
+        catplot(pack$quant,pack$medians,pack$FPKMmedian,input$constant1,pack$colors,pack$labels,
+                xlim=c(input$xstart3,input$xend3),ylim=c(input$ystart3,input$yend3),
+                xlab="Size of list",ylab="Proportion in common",main="without constant")
+    })
+    output$catplot2_qn <- renderPlot({
+        pack <- packs_qn()
+        catplot(pack$quant,pack$medians,pack$FPKMmedian,input$constant1,pack$colors,pack$labels,
+                xlim=c(input$xstart3,input$xend3),ylim=c(input$ystart3,input$yend3),
+                xlab="Size of list",ylab="Proportion in common",main="constant added",stringent=F)
     })
     output$catplotarray1 <- renderPlot({
         pack <- packs()
-        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",pack$colors,pack$labels,
+        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",
+                           pack$colors,pack$labels,
                            xlim=c(input$xstart4,input$xend4),ylim=c(input$ystart4,input$yend4),
-                           xlab="Size of list",ylab="Proportion in common",main=NULL)
+                           xlab="Size of list",ylab="Proportion in common",main="without constant")
     })
     output$catplotarray2 <- renderPlot({
         pack <- packs()
-        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",pack$colors,pack$labels,
+        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",
+                           pack$colors,pack$labels,
                            xlim=c(input$xstart4,input$xend4),ylim=c(input$ystart4,input$yend4),
-                           xlab="Size of list",ylab="Proportion in common",main=NULL,stringent=F)
+                           xlab="Size of list",ylab="Proportion in common",main="constant added",stringent=F)
+    })
+    output$catplotarray1_qn <- renderPlot({
+        pack <- packs_qn()
+        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",
+                           pack$colors,pack$labels,
+                           xlim=c(input$xstart4,input$xend4),ylim=c(input$ystart4,input$yend4),
+                           xlab="Size of list",ylab="Proportion in common",main="without constant")
+    })
+    output$catplotarray2_qn <- renderPlot({
+        pack <- packs_qn()
+        catplot_microarray(pack$quant,pack$medians,pack$FPKMmedian,input$constant2,"array.rda",
+                           pack$colors,pack$labels,
+                           xlim=c(input$xstart4,input$xend4),ylim=c(input$ystart4,input$yend4),
+                           xlab="Size of list",ylab="Proportion in common",main="constant added",stringent=F)
     })
 })
