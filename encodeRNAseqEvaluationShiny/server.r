@@ -245,9 +245,10 @@ catplot_microarray <- function(quant,medians,fpkmmedian,cut,array,colors,text,xl
 }
 
 ## shiny server
-colors <- c("brown","red","royalblue","seagreen","olivedrab1","purple",
-            "maroon1","black","orange","yellow")
-labels <- c("RSEM tpm","RSEM tpmpme","Flux Capacitor","Cufflinks with STAR","Cufflinks with Tophat","Sailfish","eXpress","Naive")
+colors <- c("brown","red","orange","seagreen","olivedrab1","royalblue","purple",
+            "maroon1","black","yellow")
+labels <- c("RSEM tpm","RSEM tpmpme","RSEM STAR","Cufflinks STAR","Cufflinks Tophat",
+            "Flux Capacitor","Sailfish","eXpress","Naive")
 shinyServer(function(input, output) {
     packs_qn <- reactive({
         cat(input$protocol,'\t',input$genetype,"\n")
